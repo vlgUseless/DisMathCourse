@@ -12,7 +12,7 @@ using std::string;
 void ReadingTable(char Table[TAB_SIZE][TAB_SIZE], std::string filename);
 void PadOperand(string& operand, const char paddingChar, const int size);
 void RemoveLeadingZeros(string& number);
-bool isGreaterThan(const string& operand1, const string& operand2);
+bool isGreaterThan(string operand1, string operand2);
 bool IsOperandValid(const std::string& operand);
 void SwapOperands(string& operand1, string& operand2);
 

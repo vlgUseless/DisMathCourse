@@ -85,7 +85,11 @@ void SwapOperands(string& operand1, string& operand2) {
     operand2 = temp;
 }
 
-bool isGreaterThan(const string& operand1, const string& operand2) {
+//TODO
+bool isGreaterThan(string operand1,string operand2) {
+    RemoveLeadingZeros(operand1);
+    RemoveLeadingZeros(operand2);
+
     int value1 = 0, value2 = 0;
     string op1 = operand1;
     string op2 = operand2;
@@ -311,10 +315,10 @@ void MultiplyOperands(string& operand1, string& operand2, string& result) {
 }
 
 void DivideOperands(string& operand1, string& operand2, string& result) {
-    bool sign = false, flag = false;
+    bool sign = false, flagMP = false, flagMM = false;
     // Если выражение вида -a / b
     if (operand1[0] == '-' and operand2[0] != '-') {
-        flag = true;
+        flagMP = true;
         // Обрезам операнд
         operand1 = operand1.substr(1, operand1.length());
     }
@@ -326,6 +330,7 @@ void DivideOperands(string& operand1, string& operand2, string& result) {
     }
     // Если выражение вида -a / (-b) = a * b
     if (operand1[0] == '-' and operand2[0] == '-') {
+        flagMM = true;
         // Обрезаем операнды
         operand1 = operand1.substr(1, operand1.length());
         operand2 = operand2.substr(1, operand2.length());
@@ -351,10 +356,11 @@ void DivideOperands(string& operand1, string& operand2, string& result) {
 
 
     if (operand2 == "b") {
-        if (flag) { // Если операнд1 отрицательный
+        PadOperand(operand1, 'a', TAB_SIZE);
+        if (flagMP) { // Если операнд1 отрицательный
             operand1 = "-" + operand1; // Возвращаем знак
         }
-        result = operand1 + "#a";
+        result = operand1 + "#aaaaaaaa";
         if (sign) {
             result = "-" + result;
         }
@@ -385,10 +391,10 @@ void DivideOperands(string& operand1, string& operand2, string& result) {
     if (res4.length() > 8) {
         res4 = "";
     }
+    //TODO ОТЧЁТ flagMM
     while (true) {
-
         if (isGreaterThan(operand2, divisible)) {
-            if (flag) {
+            if (flagMP or flagMM) {
                 if (divisible != "aaaaaaaa") {
                     AddOperands(result, add, result); // + 1
                     string approx;
@@ -399,7 +405,9 @@ void DivideOperands(string& operand1, string& operand2, string& result) {
                     SubtractOperands(approx, operand1, divisible);
                 }
                 PadOperand(result, 'a', TAB_SIZE);
-                result = "-" + result;
+                if (flagMP) {
+                    result = "-" + result;
+                }
             }
             if (sign) {
                 result = "-" + result;
@@ -409,21 +417,25 @@ void DivideOperands(string& operand1, string& operand2, string& result) {
         }
         else if (res1 != "" and isGreaterThan(divisible, res1))
         {
+            RemoveLeadingZeros(res1);
             SubtractOperands(divisible, res1, divisible);
             AddOperands(result, add8, result);
         }
         else if (res2 != "" and isGreaterThan(divisible, res2))
         {
+            RemoveLeadingZeros(res2);
             SubtractOperands(divisible, res2, divisible);
             AddOperands(result, add6, result);
         }
         else if (res3 != "" and isGreaterThan(divisible, res3))
         {
+            RemoveLeadingZeros(res3);
             SubtractOperands(divisible, res3, divisible);
             AddOperands(result, add4, result);
         }
         else if (res4 != "" and isGreaterThan(divisible, res4))
         {
+            RemoveLeadingZeros(res4);
             SubtractOperands(divisible, res4, divisible);
             AddOperands(result, add3, result);
         }
