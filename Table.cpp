@@ -85,7 +85,6 @@ void SwapOperands(string& operand1, string& operand2) {
     operand2 = temp;
 }
 
-//TODO
 bool isGreaterThan(string operand1,string operand2) {
     RemoveLeadingZeros(operand1);
     RemoveLeadingZeros(operand2);
@@ -391,7 +390,7 @@ void DivideOperands(string& operand1, string& operand2, string& result) {
     if (res4.length() > 8) {
         res4 = "";
     }
-    //TODO ÎÒ×¨Ò flagMM
+
     while (true) {
         if (isGreaterThan(operand2, divisible)) {
             if (flagMP or flagMM) {

@@ -5,7 +5,7 @@
 #include <functional>
 
 using namespace std;
-//TODO НЕ РАБОТАЕТ ПРИ МАЛЕНЬКОМ ДЕЛЕНИИ (-f / b), при f / b неправильно выводит остаток
+
 string DoOperation(const string& operand1, const string& operand2,
     const string& oper) {
     string result, new_operand1 = operand1, new_operand2 = operand2;
