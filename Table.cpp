@@ -8,8 +8,6 @@
 using namespace std;
 
 char order[] = "abehcdfg";
-map<char, int> symbols{ {'a', 0},{'b', 1},{'e', 2},{'h', 3},{'c', 4},{'d', 5},{'f', 6}, {'g', 7}};
-map<char, int> symbolsReverse{ {0, 'a'},{1, 'b'},{2, 'e'},{3, 'h'},{4, 'c'},{5, 'd'},{6, 'f'}, {7, 'g'}};
 
 char TableAdd[TAB_SIZE][TAB_SIZE];
 char TableAddShift[TAB_SIZE][TAB_SIZE];
@@ -89,30 +87,39 @@ bool isGreaterThan(string operand1,string operand2) {
     RemoveLeadingZeros(operand1);
     RemoveLeadingZeros(operand2);
 
-    int value1 = 0, value2 = 0;
-    string op1 = operand1;
-    string op2 = operand2;
-
-    if (operand1.length() > operand2.length()) {
+    if (operand1.length() > operand2.length() or operand1 == operand2) {
         return true;
+    }
+    else if (operand1.length() < operand2.length()) {
+        return false;
     }
     
 
-    if (op1[0] == '-') {
-        op1 = op1.substr(1, op1.length());
+    if (operand1[0] == '-') {
+        operand1 = operand1.substr(1, operand1.length());
     }
-    if (op2[0] == '-') {
-        op2 = op2.substr(1, op2.length());
-    }
-    for (char c : operand1) {
-        value1 = value1 * 8 + symbols[c];
+    if (operand2[0] == '-') {
+        operand2 = operand2.substr(1, operand2.length());
     }
 
-    for (char c : operand2) {
-        value2 = value2 * 8 + symbols[c];
-    }
 
-    return value1 > value2;
+    for (int i = 0; i < TAB_SIZE; i++) {
+        if (operand1[i] != 'a' or operand2[i] != 'a') {
+            for (int j = 0; j < TAB_SIZE; j++) {
+                if (operand1[i] != operand2[i]) {
+                    // Если элемент операнда1 встречается в списке раньше
+                    if (operand1[i] == order[j]) {
+                        return false;
+                    }
+                    // Если элемент операнда2 встречается в списке раньше
+                    else if (operand2[i] == order[j]) {
+                        return true;
+                    }
+                }
+
+            }
+        }
+    }
 }
 
 // Функция для проверки валидности ввода
@@ -443,4 +450,156 @@ void DivideOperands(string& operand1, string& operand2, string& result) {
             AddOperands(result, add, result);
         }
     }
+}
+
+string DoOperation(const string& operand1, const string& operand2,
+    const string& oper) {
+    string result, new_operand1 = operand1, new_operand2 = operand2;
+    bool sign = false;
+    if (oper == "+") {
+        // Если выражение вида -a + b = b - a
+        if (operand1[0] == '-' and operand2[0] != '-') {
+            // Обрезам операнд
+            new_operand1 = operand1.substr(1, operand1.length());
+            SubtractOperands(new_operand2, new_operand1, result);
+        }
+        // Если выражение вида a + (-b) = a - b
+        else if (operand2[0] == '-' and operand1[0] != '-') {
+            // Обрезам операнд
+            new_operand2 = operand2.substr(1, operand2.length());
+            SubtractOperands(new_operand1, new_operand2, result);
+        }
+        // Если выражение вида -a + (-b) = -(a + b)
+        else if (operand1[0] == '-' and operand2[0] == '-') {
+            sign = true; // Устанавливаем знак всего выражения
+            // Обрезаем операнды
+            new_operand1 = operand1.substr(1, operand1.length());
+            new_operand2 = operand2.substr(1, operand2.length());
+            AddOperands(new_operand1, new_operand2, result);
+        }
+        else {
+            AddOperands(new_operand1, new_operand2, result);
+        }
+
+        if (sign) {
+            result = "-" + result;
+        }
+    }
+    else if (oper == "-") {
+        // Если выражение вида -a - b = -(a + b)
+        if (operand1[0] == '-' and operand2[0] != '-') {
+            // Обрезам операнд
+            new_operand1 = operand1.substr(1, operand1.length());
+            AddOperands(new_operand1, new_operand2, result);
+            result = '-' + result;
+        }
+        // Если выражение вида a - (-b) = a + b
+        else if (operand2[0] == '-' and operand1[0] != '-') {
+            // Обрезам операнд
+            new_operand2 = operand2.substr(1, operand2.length());
+            AddOperands(new_operand1, new_operand2, result);
+        }
+        // Если выражение вида -a - (-b) = b - a
+        else if (operand1[0] == '-' and operand2[0] == '-') {
+            // Обрезаем операнды
+            new_operand1 = operand1.substr(1, operand1.length());
+            new_operand2 = operand2.substr(1, operand2.length());
+            SubtractOperands(new_operand2, new_operand1, result);
+        }
+        else {
+            SubtractOperands(new_operand1, new_operand2, result);
+        }
+
+    }
+    else if (oper == "*") {
+        // Если выражение вида -a * b
+        if (operand1[0] == '-' and operand2[0] != '-') {
+            sign = true;
+            // Обрезам операнд
+            new_operand1 = operand1.substr(1, operand1.length());
+        }
+        // Если выражение вида a * -b
+        else if (operand2[0] == '-' and operand1[0] != '-') {
+            sign = true;
+            // Обрезам операнд
+            new_operand2 = operand2.substr(1, operand2.length());
+        }
+        // Если выражение вида -a * (-b) = a * b
+        else if (operand1[0] == '-' and operand2[0] == '-') {
+            // Обрезаем операнды
+            new_operand1 = operand1.substr(1, operand1.length());
+            new_operand2 = operand2.substr(1, operand2.length());
+        }
+        MultiplyOperands(new_operand1, new_operand2, result);
+        if (sign and result != "a") {
+            result = "-" + result;
+        }
+    }
+    else if (oper == "/") {
+        DivideOperands(new_operand1, new_operand2, result);
+    }
+    return result;
+}
+
+
+bool ProcessExpression(const string& input) {
+    istringstream iss(input);
+    string operand1, operand2, oper;
+    string result;
+
+    if (iss >> operand1 >> oper >> operand2) {
+        // Проверка валидности операндов
+        if (IsOperandValid(operand1) && IsOperandValid(operand2)) {
+            // Удаляем незначащие нули
+            RemoveLeadingZeros(operand1);
+            RemoveLeadingZeros(operand2);
+            // Выбор соответствующей операции в зависимости от оператора
+
+            bool validOperator = (oper == "+") or (oper == "-") or
+                (oper == "*") or (oper == "/");
+            if (validOperator) {
+                result = DoOperation(operand1, operand2, oper);
+
+                // Обработка результата деления
+                if (result.length() > 9 and (result[8] == '#' or
+                    result[9] == '#')) {
+                    // Частное
+                    string quotient = result.substr(0, result.find('#'));
+                    // Остаток
+                    string remainder = result.substr(result.find('#')
+                        + 1, result.length());
+                    RemoveLeadingZeros(quotient);
+                    RemoveLeadingZeros(remainder);
+                    cout << "Частное: " << quotient << " Остаток: "
+                        << remainder << endl;
+                    return true;
+                }
+
+                if (result == "Пустое множество.") {
+                    cout << result << endl;
+                    return true;
+                }
+
+                // Обработка переполнения
+                if ((((result.length() > 8 and result[0] != '-') or
+                    (result[0] == '-' and result.length() > 9)) and
+                    result[0] != '[')) {
+                    cout << "Переполнение." << endl;
+                    return false;
+                }
+
+                RemoveLeadingZeros(result);
+                cout << "Результат: " << result << endl;
+                return true;
+            }
+        }
+        else {
+            cout << "Ошибка: операнд содержит недопустимые символы или "
+                << "превышает 8 символов." << endl;
+        }
+    }
+    else {
+        cout << "Ошибка ввода выражения." << endl;
+    }
+    return false;
 }

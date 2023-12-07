@@ -30,3 +30,7 @@ void MultiplyOperands(string& operand1, string& operand2, string& result);
 
 void DivideOperands(string& operand1, string& operand2, string& result);
 
+string DoOperation(const string& operand1, const string& operand2,
+    const string& oper);
+bool ProcessExpression(const string& input);
+
